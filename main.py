@@ -166,48 +166,51 @@ def research(question,querylist):
 		searchqueries = ', '.join(researchlist['query'])
 	if 'search_query' in researchlist:
 		searchqueries = ', '.join(researchlist['search_query'])
-	print(f"Searching DuckDuckGo for: {searchqueries}")
-	url = construct_search_url(str(searchqueries))
-	search = UrlHandler()
-	search_data = search.get_url(url,mode='output')
-	search_data_cleaned = os.linesep.join([s for s in search_data.splitlines() if s])
-	#2500 should return about 5 results from duckduckgo
-	#print(search_data_cleaned[:2500])
-	starttime = time.time()
-	prompt = str(persona)+ "Your Search(query) function has returned the data. Answer the query based on the provided data, only answer the question and do not add additional comments. Search results:" + str(search_data_cleaned[:2500]) + "Answer the question: " + str(question) + ". The answer to your question is..."
-	#print(prompt)
-	req_json = {
-	"stream": False,
-	"n_predict": 24576,
-	"temperature": 0.7,
-	"stop": [
-	    "</s>",
-	],
-	"repeat_last_n": 256,
-	"repeat_penalty": 1,
-	"top_k": 20,
-	"top_p": 0.75,
-	"tfs_z": 1,
-	"typical_p": 1,
-	"presence_penalty": 0,
-	"frequency_penalty": 0,
-	"mirostat": 0,
-	"mirostat_tau": 5,
-	"mirostat_eta": 0.1,
-	"grammar": "",
-	"n_probs": 0,
-	"prompt": prompt
-	}
 
-	#print(prompt)
-	res = requests.post(AIurl, json=req_json)
-	result = res.json()["content"]
-	#print(result)
-	
-	endtime = time.time()
-	runtime = endtime - starttime
-	print(f"Research Runtime: {runtime}s")
-	return(result)
+	#assume the json might be wonky.
+	if searchqueries in locals():
+		print(f"Searching DuckDuckGo for: {searchqueries}")
+		url = construct_search_url(str(searchqueries))
+		search = UrlHandler()
+		search_data = search.get_url(url,mode='output')
+		search_data_cleaned = os.linesep.join([s for s in search_data.splitlines() if s])
+		#2500 should return about 5 results from duckduckgo
+		#print(search_data_cleaned[:2500])
+		starttime = time.time()
+		prompt = str(persona)+ "Your Search(query) function has returned the data. Answer the query based on the provided data, only answer the question and do not add additional comments. Search results:" + str(search_data_cleaned[:2500]) + "Answer the question: " + str(question) + ". The answer to your question is..."
+		#print(prompt)
+		req_json = {
+		"stream": False,
+		"n_predict": 24576,
+		"temperature": 0.7,
+		"stop": [
+		    "</s>",
+		],
+		"repeat_last_n": 256,
+		"repeat_penalty": 1,
+		"top_k": 20,
+		"top_p": 0.75,
+		"tfs_z": 1,
+		"typical_p": 1,
+		"presence_penalty": 0,
+		"frequency_penalty": 0,
+		"mirostat": 0,
+		"mirostat_tau": 5,
+		"mirostat_eta": 0.1,
+		"grammar": "",
+		"n_probs": 0,
+		"prompt": prompt
+		}
+
+		#print(prompt)
+		res = requests.post(AIurl, json=req_json)
+		result = res.json()["content"]
+		#print(result)
+		
+		endtime = time.time()
+		runtime = endtime - starttime
+		print(f"Research Runtime: {runtime}s")
+		return(result)
 
 while True:
     user_response = input("Ask me a question, I will provide a list of sub-task that may allow me to do the research: ")
